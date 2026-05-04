@@ -54,6 +54,10 @@ html[data-theme="dark"] {
     --button-color: #4a4a4a;
 }
 
+html[data-theme="dark"] .timer-notice {
+    color: #9fd1ff;
+}
+
 html[data-theme="light"] {
     --bg-primary: rgb(205, 253, 237);
     --text-primary: #000;
@@ -150,6 +154,7 @@ button {
     margin: 10px;
     padding: 5px 10px;
     cursor: pointer;
+    color: var(--text-primary);
     border: 1px solid var(--border-color);
     background-color: var(--button-color);
     transition: background-color 0.3s;
@@ -168,6 +173,10 @@ button:hover {
     button:hover {
         background-color: #5a5a5a;
     }
+}
+
+.input-task {
+    margin-top: 70px;
 }
 
 .add-btn {
@@ -196,6 +205,46 @@ button:hover {
     font-size: 40px;
     font-weight: bold;
     margin: 10px 0 20px;
+}
+
+.custom-timer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.timer-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.timer-row span {
+    font-weight: bold;
+    min-width: 110px;
+    text-align: left;
+}
+
+.timer-row input {
+    width: 92px;
+    margin: 0;
+}
+
+.timer-row button {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.timer-row button:hover {
+    background-color: #e0e0e0;
+}
+
+.timer-notice {
+    margin: 0 0 12px;
+    font-weight: bold;
+    color: #0b6bcb
 }
 
 @keyframes fadeIn {

@@ -9,6 +9,8 @@ export default function App() {
         return savedTasks ? JSON.parse(savedTasks) : [];
     });
     const [timeLeft, setTimeLeft] = useState(25 * 60);
+    const [focuzMin, setFocuzMin] = useState(() => localStorage.getItem("focuzMin") || "25");
+    const [breakMin, setBreakMin] = useState(() => localStorage.getItem("breakMin") || "5");
     const [isRunning, setIsRunning] = useState(false);
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem("theme") || "system";
@@ -17,6 +19,7 @@ export default function App() {
     const totalTasks = tasks.length;
     const [editItem, setEditItem] = useState(null);
     const [editText, setEditText] = useState("");
+    const [timerNotice, setTimerNotice] = useState("");
 
     const handleAdd = () => {
         if (input.trim() !== "") {
@@ -42,6 +45,7 @@ export default function App() {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     setIsRunning(false);
+                    notifyTimerComplete();
                     return 0;
                 }
                 return prev - 1;
@@ -54,6 +58,14 @@ export default function App() {
     useEffect(() => {
         localStorage.setItem("tasks", JSON.stringify(tasks));
     }, [tasks]);
+
+    useEffect(() => {
+        localStorage.setItem("focuzMin", focuzMin);
+    }, [focuzMin]);
+
+    useEffect(() => {
+        localStorage.setItem("breakMin", breakMin);
+    }, [breakMin]);
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -113,6 +125,46 @@ export default function App() {
         setEditText("");
     };
 
+    const applyTimerMinutes = (minutes) => {
+        setIsRunning(false);
+        const parsedMinutes = Number.parseInt(minutes, 10);
+
+        if (!Number.isFinite(parsedMinutes) || parsedMinutes <= 0) {
+            return;
+        }
+
+        setTimeLeft(parsedMinutes * 60);
+    };
+
+    const notifyTimerComplete = () => {
+        const message = "Time is up!"
+        setTimerNotice(message);
+
+        if (typeof window !== "undefined") {
+            window.setTimeout(() => {
+                setTimerNotice("");
+            }, 5000);
+        }
+
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+            navigator.vibrate([200, 125, 200]);
+        }
+
+        if (typeof window === "undefined" || !("Notification" in window)) return;
+
+        if (Notification.permission === "granted") {
+            new Notification("FocuzTime", { body: message });
+        }
+
+        if (Notification.permission === "default") {
+            Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                    new Notification("FocuzTime", { body: message });
+                }
+            });
+        }
+    };
+
     return (
         <>
             <button className="theme-toggle" onClick={handleThemeButton} title="Toggle theme">
@@ -120,76 +172,97 @@ export default function App() {
             </button>
             <div className="app">
                 <h1>FocuzTime</h1>
-            
-            <p >Welcome to FocuzTime</p>
-            <p >Are you ready to get some work done today?</p>
-            <p>Progress: {completedTasks} / {totalTasks} tasks completed</p>
+                <p >Welcome to FocuzTime</p>
+                <p >Are you ready to get some work done today?</p>
+                <p>Progress: {completedTasks} / {totalTasks} tasks completed</p>
 
-            <div className="timer">
-                <h3>Focus Timer</h3>
-                <p className="timer-text">{formatTime(timeLeft)}</p>
-                <button onClick={() => setIsRunning(!isRunning)}>
-                    {isRunning ? "Pause" : "Start"}
-                </button>
-                <button onClick={() => {
-                    setIsRunning(false);
-                    setTimeLeft(25 * 60);
-                }}>
-                    Focus
-                </button>
-                
-                <button onClick={() => {
-                    setIsRunning(false);
-                    setTimeLeft(5 * 60);
-                }}>Break</button>
-            </div>
-            <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Enter a task here..."
-            />
-            <button className="add-btn" onClick={handleAdd}>Add Task</button>
-            <ul>
-                {tasks.map((task, index) => (
-                    <li className={task.completed ? "task-item completed-task" : "task-item"} key={index}>
+                <div className="timer">
+                    <h3>Focus Timer</h3>
+                    <p className="timer-text">{formatTime(timeLeft)}</p>
+                    {timerNotice && <p className="timer-notice">{timerNotice}</p>}
+                    <button onClick={() => setIsRunning(!isRunning)}>
+                        {isRunning ? "Pause" : "Start"}
+                    </button>
+                    <button onClick={() => {
+                        applyTimerMinutes(focuzMin);
+                    }}>
+                        Focus
+                    </button>
+                    
+                    <button onClick={() => {
+                        applyTimerMinutes(breakMin);
+                    }}>Break</button>
+                </div>
+                <div className="custom-timer">
+                    <div className="timer-row">
+                        <span>Focus Minutes:</span>
                         <input
-                            type="checkbox"
-                            className="task-checkbox"
-                            checked={task.completed}
-                            onChange={() => handleToggle(index)}
+                            type="number"
+                            min="1"
+                            value={focuzMin}
+                            onChange={(e) => setFocuzMin(e.target.value)}
                         />
+                        <button onClick={() => applyTimerMinutes(focuzMin)}>Save</button>
+                    </div>
 
-                        {editItem === index ? (
-                            <div className="task-content">
-                                <input
-                                    value={editText}
-                                    onChange={(e) => setEditText(e.target.value)}
-                                />
-                            </div>
-                        ) : (
-                            <div className="task-content">
-                                <span className="task-text" style={{textDecoration: task.completed ? "line-through" : "none"}}>{task.text}</span>
-                            </div>
-                        )}
+                    <div className="timer-row">
+                        <span>Break Minutes:</span>
+                        <input
+                            type="number"
+                            min="1"
+                            value={breakMin}
+                            onChange={(e) => setBreakMin(e.target.value)}
+                        />
+                        <button onClick={() => applyTimerMinutes(breakMin)}>Save</button>
+                    </div>
+                </div>
+                <input className="input-task"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Enter a task here..."
+                />
+                <button className="add-btn" onClick={handleAdd}>Add Task</button>
+                <ul>
+                    {tasks.map((task, index) => (
+                        <li className={task.completed ? "task-item completed-task" : "task-item"} key={index}>
+                            <input
+                                type="checkbox"
+                                className="task-checkbox"
+                                checked={task.completed}
+                                onChange={() => handleToggle(index)}
+                            />
 
-                        <div className="task-actions">
                             {editItem === index ? (
-                                <>
-                                    <button onClick={() => handleSaveEdit(index)}>Save</button>
-                                    <button onClick={handleCancelEdit}>Cancel</button>
-                                </>
+                                <div className="task-content">
+                                    <input
+                                        value={editText}
+                                        onChange={(e) => setEditText(e.target.value)}
+                                    />
+                                </div>
                             ) : (
-                                <>
-                                    <button onClick={() => handleEdit(index)}>Edit</button>
-                                    <button className="delete-btn" onClick={() => handleDelete(index)}>Delete</button>
-                                </>
+                                <div className="task-content">
+                                    <span className="task-text" style={{textDecoration: task.completed ? "line-through" : "none"}}>{task.text}</span>
+                                </div>
                             )}
-                        </div>
 
-                    </li>
-                ))}
-            </ul>
-        </div>
+                            <div className="task-actions">
+                                {editItem === index ? (
+                                    <>
+                                        <button onClick={() => handleSaveEdit(index)}>Save</button>
+                                        <button onClick={handleCancelEdit}>Cancel</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button onClick={() => handleEdit(index)}>Edit</button>
+                                        <button className="delete-btn" onClick={() => handleDelete(index)}>Delete</button>
+                                    </>
+                                )}
+                            </div>
+
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </>
     )
 }
