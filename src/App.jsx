@@ -137,8 +137,9 @@ export default function App() {
     };
 
     const notifyTimerComplete = () => {
-        const message = "Time is up!"
+        const message = "Time is up!";
         setTimerNotice(message);
+        playBeep();
 
         if (typeof window !== "undefined") {
             window.setTimeout(() => {
@@ -162,6 +163,28 @@ export default function App() {
                     new Notification("FocuzTime", { body: message });
                 }
             });
+        }
+    };
+
+    const playBeep = () => {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800; // Hz (pitch)
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (e) {
+            console.log("Audio not supported");
         }
     };
 
