@@ -13,8 +13,9 @@ This is my final project for my Front End course. FocuzTime is a web-based produ
    - Functionality: Users can create, edit, and delete tasks. Each task will display in a list format.
    - User Interactions:
      - Users type a task into an input field
-     - Click “Add” button to create a task
-     - Click “X” button to remove a task
+     - Click “Add Task” button to create a task
+     - Click “Detele” button to remove a task
+     - Click "Edit" button to edit a task
    - Technical Considerations:
      - React useState for managing tasks 
      - Components: TaskList, TaskItem 
@@ -30,7 +31,7 @@ This is my final project for my Front End course. FocuzTime is a web-based produ
 3. Pomodoro Focus Timer 
    - Functionality: A timer that helps users focus using intervals (e.g., 25 minutes work, 5 minutes break). 
    - User Interactions:
-     - Click start/pause/reset buttons
+     - Click start/pause/focus/break buttons
      - Timer countdown displayed on screen 
    - Technical Considerations:
      - React useState and useEffect for timer
@@ -40,7 +41,8 @@ This is my final project for my Front End course. FocuzTime is a web-based produ
     - Functionality: Displays the number of completed and pending tasks
     - User Interactions: 
       - Users can view their daily progress
-      - Simple visual indicators (e.g., progress bar)
+      - Simple visual indicators
+      - Animation after completion
     - Technical Considerations:
       - Derived state for task list
       - Basic UI components
