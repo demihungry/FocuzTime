@@ -1,5 +1,57 @@
+:root {
+    --bg-primary: rgb(205, 253, 237);
+    --text-primary: #000;
+    --text-secondary: #333;
+    --bg-card: white;
+    --timer-bg: rgb(242, 233, 215);
+    --input-bg: white;
+    --input-text: #000;
+    --border-color: #ccc;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    margin: 0;
+    z-index: 1000;
+    transition: transform 0.2s;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+html[data-theme="dark"] {
+    --bg-primary: #295a30;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --bg-card: #2d2d2d;
+    --timer-bg: #665947;
+    --input-bg: #3a3a3a;
+    --input-text: #e0e0e0;
+    --border-color: #816e6e;
+}
+
+html[data-theme="light"] {
+    --bg-primary: rgb(205, 253, 237);
+    --text-primary: #000;
+    --text-secondary: #333;
+    --bg-card: white;
+    --timer-bg: rgb(242, 233, 215);
+    --input-bg: white;
+    --input-text: #000;
+    --border-color: #ccc;
+}
+
 body {
-    background-color: rgb(205, 253, 237);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family:"Poppins", Arial, sans-serif;
     text-align: center;
     margin: 0;
@@ -20,7 +72,8 @@ ul {
 .task-item {
     list-style: none;
     margin: 12px 0;
-    background: white;
+    background: var(--bg-card);
+    color: var(--text-primary);
     border-radius: 18px;
     padding: 14px;
     display: grid;
@@ -58,22 +111,29 @@ ul {
 h1 {
     margin: 20px 0;
     font-size: 42px;
+    color: var(--text-primary);
 }
 
 p {
     margin: 10px 0;
+    color: var(--text-primary);
 }
 
 input {
     margin: 10px;
     padding: 5px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-family: "Poppins", Arial, sans-serif;
 }
 
 button {
     margin: 10px;
     padding: 5px 10px;
     cursor: pointer;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     background-color: #f5f5f5;
     transition: background-color 0.3s;
 }
@@ -82,9 +142,20 @@ button:hover {
     background-color: #e0e0e0;
 }
 
+@media (prefers-color-scheme: dark) {
+    button {
+        background-color: #4a4a4a;
+        color: var(--text-primary);
+    }
+    
+    button:hover {
+        background-color: #5a5a5a;
+    }
+}
+
 .add-btn {
     background: #84c8fc;
-    color: white;
+    color: rgb(0, 0, 0);
     font-weight: bold;
 }
 
@@ -94,7 +165,8 @@ button:hover {
 }
 
 .timer {
-    background-color: rgb(242, 233, 215);
+    background-color: var(--timer-bg);
+    color: var(--text-primary);
     backdrop-filter: blur(8px);
     width: 300px;
     margin: 20px auto;

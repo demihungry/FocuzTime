@@ -10,6 +10,9 @@ export default function App() {
     });
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isRunning, setIsRunning] = useState(false);
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem("theme") || "system";
+    });
     const completedTasks = tasks.filter((task) => task.completed).length;
     const totalTasks = tasks.length;
     const [editItem, setEditItem] = useState(null);
@@ -68,6 +71,29 @@ export default function App() {
         }
     }, [tasks]);
 
+    useEffect(() => {
+        localStorage.setItem("theme", theme);
+        if (theme === "system") {
+            document.documentElement.removeAttribute("data-theme");
+        } else {
+            document.documentElement.setAttribute("data-theme", theme);
+        }
+    }, [theme]);
+
+    const handleThemeButton = () => {
+        if (theme === "system") {
+            const prefersDark =
+                typeof window !== "undefined" &&
+                window.matchMedia &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches;
+            // If system is dark -> offer light, else offer dark
+            setTheme(prefersDark ? "light" : "dark");
+        } else {
+            // If currently manual, switch back to system
+            setTheme("system");
+        }
+    };
+
     const handleEdit = (index) => {
         setEditItem(index);
         setEditText(tasks[index].text);
@@ -88,8 +114,13 @@ export default function App() {
     };
 
     return (
-        <div className="app">
-            <h1>FocuzTime</h1>
+        <>
+            <button className="theme-toggle" onClick={handleThemeButton} title="Toggle theme">
+                {theme === "system" ? (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "☀️" : "🌙") : (theme === "dark" ? "☀️" : "🌙")}
+            </button>
+            <div className="app">
+                <h1>FocuzTime</h1>
+            
             <p >Welcome to FocuzTime</p>
             <p >Are you ready to get some work done today?</p>
             <p>Progress: {completedTasks} / {totalTasks} tasks completed</p>
@@ -159,5 +190,6 @@ export default function App() {
                 ))}
             </ul>
         </div>
+        </>
     )
 }
